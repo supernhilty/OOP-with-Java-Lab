@@ -7,8 +7,10 @@ package petmanagement.view;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import petmanagement.databaseservice.PetDatabaseService;
 import petmanagement.model.OrderModel;
 import petmanagement.model.OrderLine;
+import petmanagement.model.PetModel;
 import petmanagement.service.PetService;
 import petmanagement.utils.Singleton;
 import petmanagement.utils.Util;
@@ -48,9 +50,9 @@ public class OrderView extends PetStoreAbstractView<OrderModel> {
             if (!petID.isBlank() && Singleton.getInstance(PetService.class).filterById(petID)!=null) {
                 orderQuantity = Util.inputInteger("Input quantity", 0, Integer.MAX_VALUE);
                 list.add(new OrderLine(Singleton.getInstance(PetService.class).filterById(petID), orderQuantity));
-         }//else{
-//                System.out.println("Pet ID is blank or has not already existed!");
-//            }
+            }else{
+                System.out.println("Pet ID is blank or has not already existed!");
+            }
         } while (!petID.isBlank() || list.isEmpty());
         return list;
     }

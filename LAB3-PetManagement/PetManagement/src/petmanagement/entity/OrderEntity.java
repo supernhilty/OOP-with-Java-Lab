@@ -15,18 +15,18 @@ public class OrderEntity implements PetStoreEntityInterface{
     private String orderID;
     private Date orderDate;
     private String customer;
-    private int quantity;
-    private String pid;
+    private int petCount;
+    private double orderTotal;
 
     public OrderEntity() {
     }
 
-    public OrderEntity(String orderID, Date orderDate, String customer, int quantity, String pid) {
+    public OrderEntity(String orderID, Date orderDate, String customer, int petCount, double orderTotal) {
         this.orderID = orderID;
         this.orderDate = orderDate;
         this.customer = customer;
-        this.quantity = quantity;
-        this.pid = pid;
+        this.petCount = petCount;
+        this.orderTotal = orderTotal;
     }
 
     public String getOrderID() {
@@ -53,22 +53,21 @@ public class OrderEntity implements PetStoreEntityInterface{
         this.customer = customer;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public int getPetCount() {
+        return petCount;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setPetCount(int petCount) {
+        this.petCount = petCount;
     }
 
-    public String getPid() {
-        return pid;
+    public double getOrderTotal() {
+        return orderTotal;
     }
 
-    public void setPid(String pid) {
-        this.pid = pid;
+    public void setOrderTotal(double orderTotal) {
+        this.orderTotal = orderTotal;
     }
-
     
     
 }

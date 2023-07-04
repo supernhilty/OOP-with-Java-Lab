@@ -44,9 +44,9 @@ public class OrderDatabaseService extends PetStoreAbstractDatabaseService<OrderE
         sb.append(PetStoreAbstractDatabaseService.SEPARATOR);
         sb.append(entity.getCustomer());
         sb.append(PetStoreAbstractDatabaseService.SEPARATOR);
-        sb.append(entity.getQuantity());
+        sb.append(entity.getPetCount());
         sb.append(PetStoreAbstractDatabaseService.SEPARATOR);
-        sb.append(entity.getPid());
+        sb.append(entity.getOrderTotal());
         return sb.toString();
     }
 
@@ -64,9 +64,8 @@ public class OrderDatabaseService extends PetStoreAbstractDatabaseService<OrderE
                     Logger.getLogger(OrderDatabaseService.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 orderEntity.setCustomer(attributes[2]);
-                orderEntity.setQuantity(Integer.parseInt(attributes[3]));
-                orderEntity.setPid(attributes[4]);
-                
+                orderEntity.setPetCount(Integer.parseInt(attributes[3]));
+                orderEntity.setOrderTotal(Double.parseDouble(attributes[4]));
             }
         }
         return orderEntity;

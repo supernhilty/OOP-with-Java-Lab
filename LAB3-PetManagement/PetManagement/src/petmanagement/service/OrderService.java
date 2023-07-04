@@ -4,26 +4,20 @@
  */
 package petmanagement.service;
 
-import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import petmanagement.databaseservice.OrderDatabaseService;
 import petmanagement.entity.OrderEntity;
 import petmanagement.main.ModelException;
-import petmanagement.main.SortType;
 import petmanagement.model.OrderLine;
 import petmanagement.model.OrderModel;
 import petmanagement.utils.Singleton;
-import petmanagement.utils.Util;
 
 /**
  *
  * @author leyen
  */
-public class OrderService extends PetStoreAbstractService<YearMonth, OrderModel, OrderEntity> {
+public class OrderService extends PetStoreAbstractService<OrderModel, OrderEntity> {
 
     private OrderService() {
         this.dataManagementService = Singleton.getInstance(OrderDatabaseService.class);
@@ -55,49 +49,20 @@ public class OrderService extends PetStoreAbstractService<YearMonth, OrderModel,
         return saveEntitytoDatabase(OrderEntity.class);
     }
 
+   
+
     @Override
-    protected boolean saveEntitytoDatabase(Class<OrderEntity> clazz) {
-        List<OrderEntity> entityList = new ArrayList();
-        List<OrderEntity> entityDemo;
-        for (Map<String, OrderModel> subMap : this.modelMap.values()) {
-            for (OrderModel model : subMap.values()) {
-                entityDemo = toEntityList(model);
-                if (entityDemo != null) {
-                    entityList.addAll(entityDemo);
-                }
-            }
-        }
-        return this.dataManagementService.saveEntitys(entityList);
-
-    }
-
-    public List<OrderEntity> toEntityList(OrderModel model) {
-        List<OrderEntity> entityList = new ArrayList<>();
-        List<OrderLine> list = model.getOrderList();
+    protected OrderEntity toEntity(OrderModel model) {
+        OrderEntity entity = null;
         if (model != null) {
-            for (OrderLine orderline : list) {
-                OrderEntity entity = new OrderEntity();
-                entity.setOrderID(model.getId());
-                entity.setCustomer(model.getCustomer());
-                entity.setOrderDate(model.getOrderDate());
-                entity.setQuantity(orderline.getQuantity());
-                entity.setPid(orderline.getPet().getId());
-                entityList.add(entity);
-            }
-
+            entity = new OrderEntity();
+            entity.setOrderID(model.getId());
+            entity.setCustomer(model.getCustomer());
+            entity.setOrderDate(model.getOrderDate());
+            entity.setOrderTotal(model.getTotal());
+            entity.setPetCount(model.getPetCount());
         }
-        return entityList;
-    }
-
-    public List<OrderLine> filterByIdOrder(String OId, String PId, int quantity) {
-        List<OrderModel> listOrder = Singleton.getInstance(OrderService.class).getModelList();
-        List<OrderLine> listOrderLine = new ArrayList<>();
-        for (OrderModel orderModel : listOrder) {
-            if (orderModel.getId().equalsIgnoreCase(OId)) {
-                listOrderLine.add(new OrderLine(Singleton.getInstance(PetService.class).filterById(PId), quantity));
-            }
-        }
-        return listOrderLine;
+        return entity;
     }
 
     @Override
@@ -110,9 +75,8 @@ public class OrderService extends PetStoreAbstractService<YearMonth, OrderModel,
                 model.setCustomer(entity.getCustomer());
                 model.setOrderDate(entity.getOrderDate());
                 try {
-                    model.setOrderList(filterByIdOrder(entity.getOrderID(), entity.getPid(), entity.getQuantity()));
+                     model.setOrderList(Singleton.getInstance(OrderService.class).filterById(model.getId()).getOrderList());
                 } catch (Exception e) {
-
                 }
             } catch (ModelException ex) {
                 System.out.println(">>>>> Error: " + ex.getMessage());
@@ -123,63 +87,4 @@ public class OrderService extends PetStoreAbstractService<YearMonth, OrderModel,
         return model;
     }
 
-    @Override
-    protected OrderEntity toEntity(OrderModel model) {
-        OrderEntity entity = null;
-        if (model != null) {
-            entity = new OrderEntity();
-            entity.setOrderID(model.getId());
-            entity.setCustomer(model.getCustomer());
-            entity.setOrderDate(model.getOrderDate());
-//            entity.setPid(model.getOrderDate());
-//            entity.setOrderDate(model.getOrderDate());
-
-        }
-        return entity;
-    }
-
-    @Override
-    protected boolean addModelToMap(OrderModel entity) {
-        if (entity != null) {
-            YearMonth ym = Util.toYearMonth(entity.getOrderDate());
-
-        }
-        return false;
-    }
-
-    private class CompareAscByDate implements Comparator<OrderModel> {
-
-        @Override
-        public int compare(OrderModel o1, OrderModel o2) {
-            return o1.getOrderDate().compareTo(o2.getOrderDate());
-        }
-    }
-    private class CompareDescByDate implements Comparator<OrderModel> {
-
-        @Override
-        public int compare(OrderModel o1, OrderModel o2) {
-            return o2.getOrderDate().compareTo(o2.getOrderDate());
-        }
-    }
-
-    public List<OrderModel> getSortedModelList(SortType type) {
-        
-        int idx = 0;
-        for (SortType value : SortType.values()) {
-            System.out.println(idx++ + ": " + value);
-        }
-        idx = Util.inputInteger("Select index", 0, SortType.values().length -1);
-        type = SortType.values()[idx];
-        
-        
-        
-        switch (type) {
-            case SORT_ASC_BY_DATE:
-                return this.modelMap.values().stream().flatMap(e -> e.values().stream()).sorted(new CompareAscByDate()).toList();
-            case SORT_DESC_BY_DATE:
-                return this.modelMap.values().stream().flatMap(e -> e.values().stream()).sorted(new CompareDescByDate()).toList();
-            default:
-                throw new AssertionError();
-        }
-    }
 }

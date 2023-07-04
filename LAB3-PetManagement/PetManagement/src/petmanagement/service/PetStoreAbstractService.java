@@ -1,28 +1,30 @@
 package petmanagement.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import petmanagement.databaseservice.PetStoreDatabaseServiceInterface;
 import petmanagement.entity.PetStoreEntityInterface;
-import petmanagement.main.SortType;
+import petmanagement.main.ModelException;
+import petmanagement.model.OrderModel;
 import petmanagement.model.PetStoreModelInterface;
 
 /**
  * Abstract class PetStoreAbstractService.
  *
  * @author hasu
- * @param <K>
  * @param <ModelClass>
  * @param <EntityClass>
  */
 public abstract class PetStoreAbstractService<
-        K, ModelClass extends PetStoreModelInterface, EntityClass extends PetStoreEntityInterface>
+        ModelClass extends PetStoreModelInterface, EntityClass extends PetStoreEntityInterface>
         implements PetStoreServiceInterface<ModelClass> {
 
-    protected final Map<K, Map<String, ModelClass>> modelMap;
+    protected final Map<String, ModelClass> modelMap;
     protected PetStoreDatabaseServiceInterface dataManagementService;
 
     protected PetStoreAbstractService() {
@@ -31,58 +33,44 @@ public abstract class PetStoreAbstractService<
 
     @Override
     public boolean add(ModelClass object) {
-//        if (object != null && !this.modelMap.containsKey(object.getId())) {
-//            this.modelMap.put(object.getId(), object);
-//            return saveModels();
-//        }
-//        return false;
-        return addModelToMap(object);
+        if (object != null && !this.modelMap.containsKey(object.getId())) {
+            this.modelMap.put(object.getId(), object);
+            return saveModels();
+        }
+        return false;
     }
 
     @Override
     public ModelClass update(ModelClass object) {
-//        if (object != null && modelMap.containsKey(object.getId())) {
-//
-//            ModelClass update = modelMap.put(object.getId(), object);
-//            saveModels();
-//            return update;
-//        }
-        if (addModelToMap(object)) {
+        if (object != null && modelMap.containsKey(object.getId())) {
+            
+            ModelClass update =  modelMap.put(object.getId(), object);
             saveModels();
-            return object;
+            return update;
         }
         return null;
     }
 
     @Override
     public ModelClass delete(ModelClass object) {
-//        try {
-//            ModelClass delete = modelMap.remove(object.getId());
-//            saveModels();
-//            return delete;
-//        } catch (Exception e) {
-//        }
+        try {
+            ModelClass delete = modelMap.remove(object.getId());
+            saveModels();
+            return delete;
+        } catch (Exception e) {
+        }
         return null;
     }
 
     @Override
     public List<ModelClass> getModelList() {
-        return this.modelMap.values().stream().flatMap(e -> e.values().stream()).toList();
+        return this.modelMap.values().stream().toList();
     }
-    
-   
-
 
     @Override
     public ModelClass filterById(String id) {
         if (id != null && !id.isBlank()) {
-            for (Map<String, ModelClass> subMap : modelMap.values()) {
-                for (ModelClass model : subMap.values()) {
-                    if (id.equalsIgnoreCase(model.getId())) {
-                        return model;
-                    }
-                }
-            }
+            return this.modelMap.get(id.toUpperCase());
         }
         return null;
     }
@@ -94,8 +82,7 @@ public abstract class PetStoreAbstractService<
         for (EntityClass entity : entityList) {
             model = toModel(entity);
             if (model != null) {
-//                this.modelMap.put(model.getId(), model);
-                addModelToMap(model);
+                this.modelMap.put(model.getId(), model);
             }
         }
         return this.modelMap.size();
@@ -104,12 +91,10 @@ public abstract class PetStoreAbstractService<
     protected boolean saveEntitytoDatabase(Class<EntityClass> clazz) {
         List<EntityClass> entityList = new ArrayList();
         EntityClass entity;
-        for (Map<String, ModelClass> subMap : modelMap.values()) {
-            for (ModelClass model : subMap.values()) {
-                entity = toEntity(model);
-                if (entity != null) {
-                    entityList.add(entity);
-                }
+        for (ModelClass model : this.modelMap.values()) {
+            entity = toEntity(model);
+            if (entity != null) {
+                entityList.add(entity);
             }
         }
         return this.dataManagementService.saveEntitys(entityList);
@@ -156,10 +141,9 @@ public abstract class PetStoreAbstractService<
 //        }
 //        return temp;
 //        }
-    //   }
-    protected abstract EntityClass toEntity(ModelClass entity);
+ //   }
+    
+    protected abstract EntityClass toEntity(ModelClass model);
 
     protected abstract ModelClass toModel(EntityClass entity);
-
-    protected abstract boolean addModelToMap(ModelClass entity);
 }

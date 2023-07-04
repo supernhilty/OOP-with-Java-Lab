@@ -2,13 +2,11 @@ package petmanagement.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.YearMonth;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.Scanner;
 
 /**
- *
+ * 
  * @author leyen
  */
 public final class Util {
@@ -21,7 +19,7 @@ public final class Util {
 
     public static int inputInteger(String message, int minValue, int maxValue) {
         int val = Integer.MIN_VALUE;
-
+      
         Scanner sc = new Scanner(System.in);
         do {
             System.out.print(message + ": ");
@@ -64,8 +62,7 @@ public final class Util {
         } while (date == null);
         return date;
     }
-
-    public static Date inputDateAllowEmty(String message) {
+public static Date inputDateAllowEmty(String message) {
         Scanner sc = new Scanner(System.in);
         Date date = null;
         String checkEnter = "";
@@ -84,11 +81,6 @@ public final class Util {
         } while (date == null);
         return date;
     }
-
-    public static YearMonth toYearMonth(Date date) {
-        return date != null ? YearMonth.from(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()) : null;
-    }
-
     public static boolean inputBoolean(String message) {
         System.out.print(message + "(" + Boolean.TRUE.toString() + "/" + Boolean.FALSE.toString() + "): ");
         Scanner sc = new Scanner(System.in);
@@ -131,7 +123,6 @@ public final class Util {
         }
         return !createDate.after(lastUpdateDate) && !lastUpdateDate.after(now);
     }
-
     public static double InputDouble(String msg, double min, double max) {
         double r;
         Scanner sc = new Scanner(System.in);

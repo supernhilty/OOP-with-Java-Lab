@@ -18,7 +18,7 @@ import petmanagement.utils.Util;
  *
  * @author leyen
  */
-public class PetService extends PetStoreAbstractService<Category, PetModel, PetEntity> {
+public class PetService extends PetStoreAbstractService<PetModel, PetEntity> {
 
     private PetService() {
         this.dataManagementService = Singleton.getInstance(PetDatabaseService.class);
