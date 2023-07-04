@@ -139,7 +139,7 @@ public class PetManagement {
     }
 
     private void start() throws ModelException {
-        System.out.println("University management");
+        System.out.println("Pet management");
         System.out.println("Login ...");
         if (Singleton.getInstance(UserController.class).login()) {
             prepareData();
